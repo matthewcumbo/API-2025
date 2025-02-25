@@ -3,7 +3,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-include_once("../core/initialize.php");
+include_once("../../core/initialize.php");
 
 // create a new instance of the User class
 $user = new User($db);

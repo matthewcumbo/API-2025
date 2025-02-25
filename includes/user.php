@@ -4,6 +4,7 @@ class User{
     // db stuff 
     private $conn;
     private $table = "user";
+    private $alias = "u";
 
     // table properties
     public $id;
@@ -22,12 +23,35 @@ class User{
     // Read all User records
     public function read(){
         $query = "SELECT *
-                  FROM {$this->table} u
-                  ORDER BY u.username ASC;";
+                    FROM {$this->table} {$this->alias}
+                    ORDER BY {$this->alias}.username ASC;";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->execute();
+
+        return $stmt;
+    }
+
+    // Read a single User record
+    public function readSingle(){
+        $query = "SELECT * 
+                    FROM {$this->table} {$this->alias}
+                    WHERE {$this->alias}.id = ?
+                    LIMIT 1;";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($row > 0){
+            $this->username     = $row["username"];
+            $this->email        = $row["email"];
+            $this->password     = $row["password"];
+            $this->firstName    = $row["firstName"];
+            $this->lastName     = $row["lastName"];
+        }
 
         return $stmt;
     }

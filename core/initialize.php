@@ -15,5 +15,6 @@ require_once(CORE_PATH.DS."config.php");
 
 // load classes
 require_once(INC_PATH.DS."user.php");
+require_once(INC_PATH.DS."post.php");
 
 ?>
