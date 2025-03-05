@@ -13,6 +13,7 @@ class User{
     public $password;
     public $firstName;
     public $lastName;
+    public $posts;
 
     // constructor with db connection
     // a function that is triggered automatically when an instance of the class is created
@@ -55,6 +56,68 @@ class User{
 
         return $stmt;
     }
+
+    // Create a new User record
+    public function create(){
+        $query = "INSERT INTO {$this->table} 
+                    (username, email, password, firstName, lastName)
+                    VALUES(:username, :email, :password, :firstName, :lastName);";
+
+        $stmt = $this->conn->prepare($query);
+
+        // clean data sent by user (for security)
+        $this->username = htmlspecialchars(strip_tags($this->username));
+        $this->email = htmlspecialchars(strip_tags($this->email));
+        $this->password = htmlspecialchars(strip_tags($this->password));
+        $this->firstName = htmlspecialchars(strip_tags($this->firstName));
+        $this->lastName = htmlspecialchars(strip_tags($this->lastName));
+
+        // bind parameters to sql statment
+        $stmt->bindParam(":username", $this->username);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":password", $this->password);
+        $stmt->bindParam(":firstName", $this->firstName);
+        $stmt->bindParam(":lastName", $this->lastName);
+
+        if($stmt->execute()){
+            return true;
+        }
+
+        printf("Error %s. \n", $stmt->error);
+        return false;
+    }
+
+    // Read a single User record including their Posts
+    public function getUserWithPosts(){
+        $user = $this->readSingle();
+        
+        $post = new Post($this->conn);
+        $post->userId = $this->id;
+
+        $postsResult = $post->readPostsByUserId();
+        $num = $postsResult->rowCount();
+        if($num > 0){
+            $this->posts = array();
+        
+            while($row = $postsResult->fetch(PDO::FETCH_ASSOC)){
+                extract($row);
+                $post_item = array(
+                    "id"        => $id,
+                    "title"     => $title,
+                    "content"   => $content
+                );
+        
+                array_push($this->posts, $post_item);
+            }
+        }
+        else{
+            $this->posts = "No Posts by this user.";
+        }
+
+        return $user;
+    }
+
+
 }
 
 ?>

@@ -51,5 +51,43 @@ public function readSingle(){
     return $stmt;
 }
 
+public function readPostsByUserId(){
+    $query = "SELECT * 
+                FROM {$this->table} {$this->alias}
+                WHERE {$this->alias}.userId = ?;";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $this->userId);
+    $stmt->execute();
+
+    return $stmt;
+}
+
+// Create a new User record
+public function create(){
+    $query = "INSERT INTO {$this->table} 
+                (userId, title, content)
+                VALUES(:userId, :title, :content);";
+
+    $stmt = $this->conn->prepare($query);
+
+    // clean data sent by user (for security)
+    $this->userId = htmlspecialchars(strip_tags($this->userId));
+    $this->title = htmlspecialchars(strip_tags($this->title));
+    $this->content = htmlspecialchars(strip_tags($this->content));
+
+    // bind parameters to sql statment
+    $stmt->bindParam(":userId", $this->userId);
+    $stmt->bindParam(":title", $this->title);
+    $stmt->bindParam(":content", $this->content);
+
+    if($stmt->execute()){
+        return true;
+    }
+
+    printf("Error %s. \n", $stmt->error);
+    return false;
+}
+
 }
 ?>
