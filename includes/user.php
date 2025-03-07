@@ -117,6 +117,60 @@ class User{
         return $user;
     }
 
+    // Update User details
+    public function update(){
+        $query = "UPDATE {$this->table}
+                    SET username = :username,
+                    email = :email,
+                    password = :password,
+                    firstName = :firstName,
+                    lastName = :lastName
+                    WHERE id = :id;";
+
+        $stmt = $this->conn->prepare($query);
+
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->username = htmlspecialchars(strip_tags($this->username));
+        $this->email = htmlspecialchars(strip_tags($this->email));
+        $this->password = htmlspecialchars(strip_tags($this->password));
+        $this->firstName = htmlspecialchars(strip_tags($this->firstName));
+        $this->lastName = htmlspecialchars(strip_tags($this->lastName));
+
+        $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":username", $this->username);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":password", $this->password);
+        $stmt->bindParam(":firstName", $this->firstName);
+        $stmt->bindParam(":lastName", $this->lastName);
+
+        if($stmt->execute()){
+            return true;
+        }
+
+        printf("Error %s. \n", $stmt->error);
+        return false;
+    }
+
+    // Update User's Password
+    public function updatePassword(){
+        $query = "UPDATE {$this->table}
+                    SET password = :password
+                    WHERE id = :id;";
+
+        $stmt = $this->conn->prepare($query);
+
+        $this->id = htmlspecialchars(strip_tags($this->id));
+
+        $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":password", $this->password);
+
+        if($stmt->execute()){
+            return true;
+        }
+
+        printf("Error %s. \n", $stmt->error);
+        return false;
+    }
 
 }
 
