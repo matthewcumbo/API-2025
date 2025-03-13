@@ -63,7 +63,7 @@ public function readPostsByUserId(){
     return $stmt;
 }
 
-// Create a new User record
+// Create a new Post record
 public function create(){
     $query = "INSERT INTO {$this->table} 
                 (userId, title, content)
@@ -88,6 +88,25 @@ public function create(){
     printf("Error %s. \n", $stmt->error);
     return false;
 }
+
+// Delete a Post record
+public function delete(){
+    $query = "DELETE FROM {$this->table} WHERE id = :id;";
+
+    $stmt = $this->conn->prepare($query);
+
+    $this->id = htmlspecialchars(strip_tags($this->id));
+
+    $stmt->bindParam(":id", $this->id);
+
+    if($stmt->execute()){
+        return true;
+    }
+
+    printf("Error %s. \n", $stmt->error);
+    return false;
+}
+
 
 }
 ?>
