@@ -107,6 +107,23 @@ public function delete(){
     return false;
 }
 
+public function deleteUserPosts(){
+    $query = "DELETE FROM {$this->table} WHERE userId = :userId;";
+
+    $stmt = $this->conn->prepare($query);
+
+    $this->userId = htmlspecialchars(strip_tags($this->userId));
+
+    $stmt->bindParam(":userId", $this->userId);
+
+    if($stmt->execute()){
+        return true;
+    }
+
+    printf("Error %s. \n", $stmt->error);
+    return false;
+}
+
 
 }
 ?>
